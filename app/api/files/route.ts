@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {}
 }
 
-export async function getDocuments() {
+async function getDocuments() {
   return await new SimpleDirectoryReader().loadData({
     directoryPath: DATA_DIR,
   });
