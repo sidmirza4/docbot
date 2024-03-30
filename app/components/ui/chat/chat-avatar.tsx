@@ -1,4 +1,4 @@
-import { User2 } from "lucide-react";
+import { Bot, User2 } from "lucide-react";
 import Image from "next/image";
 
 export default function ChatAvatar({ role }: { role: string }) {
@@ -11,15 +11,8 @@ export default function ChatAvatar({ role }: { role: string }) {
   }
 
   return (
-    <div className="flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-md border bg-black text-white shadow">
-      <Image
-        className="rounded-md"
-        src="/llama.png"
-        alt="Llama Logo"
-        width={24}
-        height={24}
-        priority
-      />
+    <div className="flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-md border bg-secondary-foreground text-white shadow">
+      <Bot className="h-5 w-5" />
     </div>
   );
 }
