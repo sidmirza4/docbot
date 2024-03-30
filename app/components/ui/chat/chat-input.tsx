@@ -4,6 +4,7 @@ import FileUploader from "../file-uploader";
 import { Input } from "../input";
 import UploadImagePreview from "../upload-image-preview";
 import { ChatHandler } from "./chat.interface";
+import { SendHorizontal } from "lucide-react";
 
 export default function ChatInput(
   props: Pick<
@@ -77,8 +78,12 @@ export default function ChatInput(
           onFileUpload={handleUploadFile}
           onFileError={props.onFileError}
         /> */}
-        <Button type="submit" disabled={props.isLoading || props.disabled}>
-          Send message
+        <Button
+          size="icon"
+          type="submit"
+          disabled={props.isLoading || props.disabled}
+        >
+          <SendHorizontal className="h-6 w-6" />
         </Button>
       </div>
     </form>

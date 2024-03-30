@@ -63,7 +63,7 @@ export default function ChatSection() {
     <div className="flex w-full max-w-5xl flex-col gap-y-6">
       <>
         <>
-          <div className="flex rounded-lg border border-dashed border-input bg-indigo-50 p-3 text-indigo-950 shadow-xl">
+          <div className="flex rounded-lg border border-dashed border-input bg-indigo-50 p-3 text-sm text-indigo-950 shadow-xl">
             {!file ? (
               <p>Upload a document to get started</p>
             ) : (

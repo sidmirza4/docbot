@@ -3,7 +3,7 @@ import ChatSection from "./components/chat-section";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center gap-10 p-24 background-gradient">
+    <main className="background-gradient flex min-h-screen max-w-full flex-col items-center justify-center gap-4 p-4">
       <Header />
       <ChatSection />
     </main>
