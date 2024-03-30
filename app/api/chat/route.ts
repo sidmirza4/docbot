@@ -1,6 +1,14 @@
 import { initObservability } from "@/app/observability";
 import { StreamingTextResponse } from "ai";
-import { ChatMessage, MessageContent, OpenAI } from "llamaindex";
+import path from "path";
+import {
+  ChatMessage,
+  ContextChatEngine,
+  MessageContent,
+  OpenAI,
+  VectorStoreIndex,
+  storageContextFromDefaults,
+} from "llamaindex";
 import { NextRequest, NextResponse } from "next/server";
 import { createChatEngine } from "./engine";
 import { LlamaIndexStream } from "./llamaindex-stream";
@@ -9,6 +17,8 @@ initObservability();
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+const STORAGE_CACHE_DIR = path.join(process.cwd(), "cache");
 
 const convertMessageContent = (
   textMessage: string,
@@ -49,7 +59,20 @@ export async function POST(request: NextRequest) {
       maxTokens: 512,
     });
 
-    const chatEngine = await createChatEngine(llm);
+    const storageContext = await storageContextFromDefaults({
+      persistDir: STORAGE_CACHE_DIR,
+    });
+
+    const loadedIndex = await VectorStoreIndex.init({
+      storageContext,
+    });
+
+    const retriever = loadedIndex.asRetriever();
+
+    const chatEngine = new ContextChatEngine({
+      retriever,
+      chatModel: llm,
+    });
 
     // Convert message content from Vercel/AI format to LlamaIndex/OpenAI format
     const userMessageContent = convertMessageContent(

@@ -73,6 +73,7 @@ export default function ChatInput(
           value={props.input}
           onChange={props.handleInputChange}
           disabled={props.disabled}
+          autoComplete="off"
         />
         {/* <FileUploader
           onFileUpload={handleUploadFile}
