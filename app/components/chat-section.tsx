@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { insertDataIntoMessages } from "./transform";
 import { ChatInput, ChatMessages } from "./ui/chat";
 import DocUploader from "./ui/doc-uploader";
-import { Trash2 } from "lucide-react";
+import { AlertCircle, Trash2 } from "lucide-react";
 
 export default function ChatSection() {
   const {
@@ -63,12 +63,16 @@ export default function ChatSection() {
     <div className="flex w-full max-w-5xl flex-col gap-y-6">
       <>
         <>
-          <div className="flex rounded-lg border border-dashed border-input bg-indigo-50 p-3 text-sm text-indigo-950 shadow-xl">
+          <div className="flex items-center rounded-lg border border-dashed border-input bg-indigo-50 p-3 px-4 text-sm text-indigo-950 shadow-xl">
             {!file ? (
               <p>Upload a document to get started</p>
             ) : (
-              <p>
+              <p className="space-y-2">
                 Talking about: <span className="font-medium">{file.name}</span>
+                <p className="flex items-center gap-1 text-xs text-orange-700">
+                  <AlertCircle className="h-3 w-3" />
+                  <span>Changes will be lost if the page is refreshed</span>
+                </p>
               </p>
             )}
 
