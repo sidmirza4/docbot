@@ -4,6 +4,7 @@
       "/*": [
         "./cache/**/*"
       ]
-    }
+    },
+    "serverComponentsExternalPackages": ["pdf2json"]
   }
 }

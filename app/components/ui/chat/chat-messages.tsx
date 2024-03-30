@@ -6,7 +6,9 @@ import ChatMessage from "./chat-message";
 import { ChatHandler } from "./chat.interface";
 
 export default function ChatMessages(
-  props: Pick<ChatHandler, "messages" | "isLoading" | "reload" | "stop">,
+  props: Pick<ChatHandler, "messages" | "isLoading" | "reload" | "stop"> & {
+    file: File | null;
+  },
 ) {
   const scrollableChatContainerRef = useRef<HTMLDivElement>(null);
   const messageLength = props.messages.length;
@@ -35,7 +37,7 @@ export default function ChatMessages(
   }, [messageLength, lastMessage]);
 
   return (
-    <div className="w-full rounded-xl bg-white p-4 shadow-xl pb-0">
+    <div className="w-full rounded-xl bg-white p-4 pb-0 shadow-xl">
       <div
         className="flex h-[50vh] flex-col gap-5 divide-y overflow-y-auto pb-4"
         ref={scrollableChatContainerRef}
@@ -44,7 +46,7 @@ export default function ChatMessages(
           <ChatMessage key={m.id} {...m} />
         ))}
         {isPending && (
-          <div className="flex justify-center items-center pt-10">
+          <div className="flex items-center justify-center pt-10">
             <Loader2 className="h-4 w-4 animate-spin" />
           </div>
         )}

@@ -16,6 +16,7 @@ export default function ChatInput(
     | "handleInputChange"
   > & {
     multiModal?: boolean;
+    disabled?: boolean;
   },
 ) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -57,7 +58,7 @@ export default function ChatInput(
   return (
     <form
       onSubmit={onSubmit}
-      className="rounded-xl bg-white p-4 shadow-xl space-y-4"
+      className="space-y-4 rounded-xl bg-white p-4 shadow-xl"
     >
       {imageUrl && (
         <UploadImagePreview url={imageUrl} onRemove={onRemovePreviewImage} />
@@ -70,12 +71,13 @@ export default function ChatInput(
           className="flex-1"
           value={props.input}
           onChange={props.handleInputChange}
+          disabled={props.disabled}
         />
-        <FileUploader
+        {/* <FileUploader
           onFileUpload={handleUploadFile}
           onFileError={props.onFileError}
-        />
-        <Button type="submit" disabled={props.isLoading}>
+        /> */}
+        <Button type="submit" disabled={props.isLoading || props.disabled}>
           Send message
         </Button>
       </div>
