@@ -7,8 +7,12 @@ import {
   SimpleDirectoryReader,
   storageContextFromDefaults,
   VectorStoreIndex,
+  MilvusVectorStore,
+  Document,
+  PDFReader,
 } from "llamaindex";
 import removeDirectory from "@/app/utils/removeDir";
+import { getMilvusClient } from "../chat/engine/shared.mjs";
 
 import * as dotenv from "dotenv";
 
@@ -21,32 +25,60 @@ const DATA_DIR = path.join(process.cwd(), "data");
 const STORAGE_CACHE_DIR = path.join(process.cwd(), "cache");
 
 export async function POST(request: NextRequest) {
-  try {
-    const formData = await request.formData();
+  // try {
+  const formData = await request.formData();
 
-    const file = formData.get("file") as File;
+  const file = formData.get("file") as File;
 
-    if (!file) {
-      return NextResponse.json(
-        { error: "No files received." },
-        { status: 400 },
-      );
-    }
+  const fileReader = file.stream().getReader();
+  const fileDataU8: number[] = [];
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const fileSplitted = file.name.split(".");
-    const ext = fileSplitted[fileSplitted.length - 1];
-    const filename = `data-file.${ext}`;
-    try {
-      await writeFile(path.join(DATA_DIR + "/" + filename), buffer);
-      await deletePreviousContext();
-      await generateContext();
-      return NextResponse.json({ Message: "Success", status: 201 });
-    } catch (error) {
-      console.log("Error occurred ", error);
-      return NextResponse.json({ Message: "Failed", status: 500 });
-    }
-  } catch (error) {}
+  while (true) {
+    const { done, value } = await fileReader.read();
+    if (done) break;
+    // @ts-ignore
+    fileDataU8.push(...value);
+  }
+
+  const reader = new PDFReader();
+  const pdfDoc = await reader.loadData(fileDataU8.toString());
+
+  return NextResponse.json({ Message: "Success", status: 201 });
+
+  //   if (!file) {
+  //     return NextResponse.json(
+  //       { error: "No files received." },
+  //       { status: 400 },
+  //     );
+  //   }
+
+  //   const _buffer = Buffer.from(await file.arrayBuffer());
+  //   const fileSplitted = file.name.split(".");
+  //   const ext = fileSplitted[fileSplitted.length - 1];
+  //   const filename = `data-file.${ext}`;
+
+  //   // const blob = new Blob([_buffer]);
+
+  //   try {
+  //     // Connect to Milvus
+  //     const milvusClient = getMilvusClient();
+  //     const vectorStore = new MilvusVectorStore({ milvusClient });
+
+  //     // now create an index from all the Documents and store them in Milvus
+  //     const storageContext = await storageContextFromDefaults({ vectorStore });
+
+  //     // const reader = new PDFReader();
+  //     // const document = reader.loadData(file);
+
+  //     // await VectorStoreIndex.fromDocuments(documents, {
+  //     //   storageContext: storageContext,
+  //     // });
+  //     return NextResponse.json({ Message: "Success", status: 201 });
+  //   } catch (error) {
+  //     console.log("Error occurred ", error);
+  //     return NextResponse.json({ Message: "Failed", status: 500 });
+  //   }
+  // } catch (error) {}
 }
 
 async function getDocuments() {

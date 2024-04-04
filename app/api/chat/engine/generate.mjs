@@ -1,46 +1,37 @@
-import {
-  serviceContextFromDefaults,
-  storageContextFromDefaults,
-  VectorStoreIndex,
-} from "llamaindex";
-
+/* eslint-disable turbo/no-undeclared-env-vars */
 import * as dotenv from "dotenv";
-
-import { CHUNK_OVERLAP, CHUNK_SIZE, STORAGE_CACHE_DIR } from "./constants.mjs";
+import {
+  MilvusVectorStore,
+  VectorStoreIndex,
+  storageContextFromDefaults,
+} from "llamaindex";
 import { getDocuments } from "./loader.mjs";
+import { checkRequiredEnvVars, getMilvusClient } from "./shared.mjs";
 
-// Load environment variables from local .env file
 dotenv.config();
 
-async function getRuntime(func) {
-  const start = Date.now();
-  await func();
-  const end = Date.now();
-  return end - start;
-}
+const collectionName = process.env.MILVUS_COLLECTION;
 
-async function generateDatasource(serviceContext) {
-  console.log(`Generating storage context...`);
-  // Split documents, create embeddings and store them in the storage context
-  const ms = await getRuntime(async () => {
-    const storageContext = await storageContextFromDefaults({
-      persistDir: STORAGE_CACHE_DIR,
-    });
-    const documents = await getDocuments();
-    await VectorStoreIndex.fromDocuments(documents, {
-      storageContext,
-      serviceContext,
-    });
+async function loadAndIndex() {
+  // load objects from storage and convert them into LlamaIndex Document objects
+  const documents = await getDocuments();
+
+  // Connect to Milvus
+  const milvusClient = getMilvusClient();
+  const vectorStore = new MilvusVectorStore({ milvusClient });
+
+  // now create an index from all the Documents and store them in Milvus
+  const storageContext = await storageContextFromDefaults({ vectorStore });
+  await VectorStoreIndex.fromDocuments(documents, {
+    storageContext: storageContext,
   });
-  console.log(`Storage context successfully generated in ${ms / 1000}s.`);
+  console.log(
+    `Successfully created embeddings in the Milvus collection ${collectionName}.`,
+  );
 }
 
 (async () => {
-  const serviceContext = serviceContextFromDefaults({
-    chunkSize: CHUNK_SIZE,
-    chunkOverlap: CHUNK_OVERLAP,
-  });
-
-  await generateDatasource(serviceContext);
+  checkRequiredEnvVars();
+  await loadAndIndex();
   console.log("Finished generating storage.");
 })();
